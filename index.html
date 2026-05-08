@@ -574,22 +574,31 @@
   function parseSheet(csvRows) {
     const target = [];
     const actual = [];
-    for (const r of csvRows) {
-      if (!r || r.length < 10) continue;
-      const team = (r[0] || '').trim();
-      const name = (r[1] || '').trim();
-      const gubun = (r[2] || '').trim();
-      if (gubun !== '월 목표' && gubun !== '월 실적') continue;
-      if (!/^\d팀$/.test(team)) continue;
+    // 시트는 좌측(0~9열) + 우측(11~20열)에 두 테이블이 나란히 있음.
+    const tryParseBlock = (r, offset) => {
+      const team = (r[offset + 0] || '').trim();
+      const name = (r[offset + 1] || '').trim();
+      const gubun = (r[offset + 2] || '').trim();
+      if (gubun !== '월 목표' && gubun !== '월 실적') return null;
+      if (!/^\d팀$/.test(team)) return null;
       const obj = { team, name };
-      let valid = true;
       for (let i = 0; i < KPIS.length; i++) {
-        const v = parseFloat((r[3 + i] || '').trim());
-        if (isNaN(v)) { valid = false; break; }
+        const v = parseFloat((r[offset + 3 + i] || '').trim());
+        if (isNaN(v)) return null;
         obj[KPIS[i]] = v;
       }
-      if (!valid) continue;
-      (gubun === '월 목표' ? target : actual).push(obj);
+      return { gubun, obj };
+    };
+    for (const r of csvRows) {
+      if (!r) continue;
+      if (r.length >= 10) {
+        const left = tryParseBlock(r, 0);
+        if (left) (left.gubun === '월 목표' ? target : actual).push(left.obj);
+      }
+      if (r.length >= 21) {
+        const right = tryParseBlock(r, 11);
+        if (right) (right.gubun === '월 목표' ? target : actual).push(right.obj);
+      }
     }
     return { monthTarget: target, monthActual: actual };
   }
