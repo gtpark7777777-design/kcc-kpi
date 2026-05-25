@@ -1043,3 +1043,44 @@
 </script>
 </body>
 </html>
+
+<!-- ═══ KCC KPI 동기화 버튼 (Claude × 박기택 / 2026-05-25 추가) ═══ -->
+<div id="kccSyncBox" style="position:fixed;top:14px;right:14px;z-index:9999;font-family:system-ui,-apple-system,sans-serif;text-align:right;">
+  <button id="syncBtn" onclick="syncFromImage()" style="background:#0b5394;color:white;padding:10px 18px;border:none;border-radius:8px;cursor:pointer;font-weight:600;font-size:14px;box-shadow:0 3px 8px rgba(0,0,0,0.25);">
+    📷 이미지로 동기화
+  </button>
+  <div id="syncStatus" style="margin-top:6px;font-size:12px;color:#333;background:rgba(255,255,255,0.95);padding:6px 10px;border-radius:6px;box-shadow:0 1px 4px rgba(0,0,0,0.12);min-height:18px;display:none;"></div>
+</div>
+<script>
+const GAS_SYNC_URL = 'https://script.google.com/macros/s/AKfycbyoOqVQ_KNOYUeUWFBhRmF0EHuKVyJ1LlzwJgwluAzgUcRkXNGVFFGD9-lYooWE8Cz5Ig/exec';
+async function syncFromImage() {
+  const btn = document.getElementById('syncBtn');
+  const status = document.getElementById('syncStatus');
+  btn.disabled = true;
+  btn.textContent = '⏳ 동기화 중...';
+  status.style.display = 'block';
+  status.textContent = 'Drive 이미지 → Gemini OCR → 시트 입력 (약 25초)';
+  status.style.color = '#666';
+  try {
+    const r = await fetch(GAS_SYNC_URL + '?action=sync&t=' + Date.now());
+    const data = await r.json();
+    if (data.ok) {
+      status.textContent = '✅ 완료 ' + data.cellsUpdated + '셀 / ' + data.elapsed + ' · 2초 뒤 새로고침';
+      status.style.color = '#0b5394';
+      btn.textContent = '📷 이미지로 동기화';
+      setTimeout(() => location.reload(), 2000);
+    } else {
+      status.textContent = '❌ ' + (data.error || '오류');
+      status.style.color = '#d33';
+      btn.textContent = '📷 다시 시도';
+    }
+  } catch (e) {
+    status.textContent = '❌ 네트워크 오류: ' + e.message;
+    status.style.color = '#d33';
+    btn.textContent = '📷 다시 시도';
+  } finally {
+    btn.disabled = false;
+  }
+}
+</script>
+<!-- ═══ KCC KPI 동기화 버튼 끝 ═══ -
