@@ -1043,14 +1043,23 @@
 </script>
 </body>
 </html>
-<!-- KCC KPI 버튼 박스 v3.2 (2026-05-25, clean) -->
-<div id="kccSyncBox" style="position:fixed;top:14px;right:14px;z-index:9999;font-family:system-ui,-apple-system,sans-serif;text-align:right;">
-  <a id="goalSheetBtn" href="https://docs.google.com/spreadsheets/d/1v-UJuFNeti1FahR0xKzYosHKHncaEnKTsLnQ1TzSWmk/edit?gid=134054004#gid=134054004" target="_blank" rel="noopener" style="display:inline-block;background:#0b5394;color:white;padding:10px 22px;border:none;border-radius:8px;cursor:pointer;font-weight:600;font-size:14px;box-shadow:0 3px 8px rgba(0,0,0,0.25);text-decoration:none;margin-bottom:8px;">🎯 목표시트</a><br>
-  <button id="syncBtn" onclick="syncFromImage()" style="background:#0b5394;color:white;padding:10px 22px;border:none;border-radius:8px;cursor:pointer;font-weight:600;font-size:14px;box-shadow:0 3px 8px rgba(0,0,0,0.25);">📷 동기화</button>
-  <div id="syncStatus" style="margin-top:6px;font-size:12px;color:#333;background:rgba(255,255,255,0.95);padding:6px 10px;border-radius:6px;box-shadow:0 1px 4px rgba(0,0,0,0.12);min-width:180px;text-align:left;line-height:1.4;"></div>
+<!-- KCC KPI 버튼 박스 v3.4 (2026-05-25, 좌우 배치 + 동일 크기 + 동적 month) -->
+<div id="kccSyncBox" style="position:fixed;top:14px;right:14px;z-index:9999;font-family:system-ui,-apple-system,sans-serif;">
+  <div style="display:flex;gap:8px;justify-content:flex-end;margin-bottom:8px;">
+    <a id="goalSheetBtn" href="https://docs.google.com/spreadsheets/d/1v-UJuFNeti1FahR0xKzYosHKHncaEnKTsLnQ1TzSWmk/edit?gid=526690472#gid=526690472" target="_blank" rel="noopener" style="display:inline-block;width:130px;text-align:center;background:#0b5394;color:white;padding:10px 0;border:none;border-radius:8px;cursor:pointer;font-weight:600;font-size:14px;box-shadow:0 3px 8px rgba(0,0,0,0.25);text-decoration:none;box-sizing:border-box;">🎯 목표시트</a>
+    <button id="syncBtn" onclick="syncFromImage()" style="width:130px;text-align:center;background:#0b5394;color:white;padding:10px 0;border:none;border-radius:8px;cursor:pointer;font-weight:600;font-size:14px;box-shadow:0 3px 8px rgba(0,0,0,0.25);box-sizing:border-box;">📷 동기화</button>
+  </div>
+  <div id="syncStatus" style="font-size:12px;color:#333;background:rgba(255,255,255,0.95);padding:6px 10px;border-radius:6px;box-shadow:0 1px 4px rgba(0,0,0,0.12);min-width:180px;text-align:left;line-height:1.4;"></div>
 </div>
 <script>
 const GAS_SYNC_URL = 'https://script.google.com/macros/s/AKfycbyoOqVQ_KNOYUeUWFBhRmF0EHuKVyJ1LlzwJgwluAzgUcRkXNGVFFGD9-lYooWE8Cz5Ig/exec';
+(function(){
+  const h1 = document.getElementById("main-title");
+  if (h1 && h1.firstChild && h1.firstChild.nodeType === 3) {
+    const month = new Date().getMonth() + 1;
+    h1.firstChild.textContent = "KCC 일산 " + month + "월 KPI 보드 ";
+  }
+})();
 function showLastSync() {
   const status = document.getElementById("syncStatus");
   try {
